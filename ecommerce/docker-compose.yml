@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-app
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8000:80"
+
+  db:
+    image: mariadb:10.5
+    container_name: ecommerce-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_USERNAME}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    ports:
+      - 3306
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  db-data:
